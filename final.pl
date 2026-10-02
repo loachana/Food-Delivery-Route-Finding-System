@@ -1,5 +1,4 @@
 %roads
-
 road(kandy, katugastota, 5.4).
 road(kandy, peradeniya, 6.1).
 road(kandy, tennakumbura, 7.7).
@@ -9,22 +8,24 @@ road(kandy, getambe, 5.5).
 road(kandy, mahaiyawa, 2.5).
 road(katugastota, mahaiyawa, 2.0).
 
+%Blocked Road(s)
+blocked(kandy, kundasale).
 
-%H values
-h(katugastota, 0).
-h(kandy, 4.5).
-h(peradeniya, 10.5).
-h(tennakumbura, 10.8).
-h(ampitiya, 8.2).
-h(kundasale, 9.5).
-h(getambe, 7.5).
-h(mahaiyawa, 2.0).
+% heuristic(Location, Goal, EstimatedDistance)
+heuristic(kandy, gampola, 20).
+heuristic(peradeniya, gampola, 15).
+heuristic(katugastota, gampola, 25).
+heuristic(kundasale, gampola, 30).
+heuristic(pilimathalawa, gampola, 10).
+heuristic(gelioya, gampola, 12).
+heuristic(kadugannawa, gampola, 8).
+heuristic(mawilmada, gampola, 30).
+heuristic(matale, gampola, 35).
+heuristic(digana, gampola, 35).
+heuristic(teldeniya, gampola, 40).
+heuristic(gampola, gampola, 0).
 
-
-:- dynamic(blocked/2).
-
-
-
+%Helps Prolog to understand bidirectional roads and avoid blocked roads
 connected(A,B,D):-
     road(A,B,D), \+blocked(A,B).
 
@@ -71,23 +72,7 @@ path_cost([A,B|Rest],Cost):-
 
 
 %A*
-astar(Start, Goal, Path, Cost):-
-	h(Start, H0),
-	astar_search([[H0,0,[Start]]], Goal, RevPath, Cost),
-	reverse(RevPath, Path).
 
-astar_search([[_,Cost,[Goal|Rest]]|_], Goal, [Goal|Rest], Cost).
-astar_search([[_,G,[Current|Rest]]|Others], Goal, Path, Cost):-
-	findall([F2, G2,[Next,Current|Rest]],
-		(connected(Current, Next, StepCost),
-		\+ member(Next,[Current|Rest]),
-		G2 is G + StepCost,
-		h(Next,H),
-		F2 is G2 + H),
-		Children),
-	append(Others, Children, All),
-	sort(All,Sorted),
-	astar_search(Sorted,Goal,Path,Cost).
 
 
 
