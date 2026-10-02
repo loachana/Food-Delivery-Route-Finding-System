@@ -90,6 +90,8 @@ astar_search([[_,G,[Current|Rest]]|Others], Goal, Path, Cost):-
 	astar_search(Sorted,Goal,Path,Cost).
 
 
+
+
 %Display results
 
 show_all_paths(Start, Goal):-
@@ -102,7 +104,24 @@ show_all_paths(Start, Goal):-
     display_paths(BfsPaths), nl,
     write('A* results'), nl,
     findall([Pa,Ca], astar(Start, Goal, Pa, Ca), APaths),
-    display_paths(APaths).
+    display_paths(APaths),
+
+    %----------------------------------------------
+    %need to study
+
+    % Combine results from all algorithms
+    append(DfsPaths, BfsPaths, TempPaths),
+    append(TempPaths, APaths, AllPaths),
+
+    % Find overall shortest path
+    shortest_path(AllPaths, ShortestPath, ShortestCost),
+
+    nl,
+    write('===== OVERALL SHORTEST ROUTE ====='), nl,
+    write('Path: '), write(ShortestPath), nl,
+    write('Distance: '), write(ShortestCost), write(' km'), nl.
+
+    %--------------------------------------------------
 
 
 
@@ -113,3 +132,31 @@ display_paths([[P,C]|Rest]) :-
 	write(' cost= '), write(C), nl, nl,
 	display_paths(Rest).
 
+
+%-------------------------------------------------------
+%need to study
+% Find path with the smallest distance
+shortest_path([[Path, Cost] | Rest], ShortestPath, ShortestCost) :-
+    shortest_path(Rest, Path, Cost, ShortestPath, ShortestCost).
+
+shortest_path([], Path, Cost, Path, Cost).
+
+shortest_path([[Path, Cost] | Rest],
+              CurrentPath, CurrentCost,
+              ShortestPath, ShortestCost) :-
+
+    ( Cost < CurrentCost ->
+        NewPath = Path,
+        NewCost = Cost
+    ;
+        NewPath = CurrentPath,
+        NewCost = CurrentCost
+    ),
+
+    shortest_path(Rest,
+                  NewPath,
+                  NewCost,
+                  ShortestPath,
+                  ShortestCost).
+
+%----------------------------------------------
