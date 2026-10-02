@@ -72,8 +72,57 @@ path_cost([A,B|Rest],Cost):-
 
 
 %A*
+astar(Start, Goal, Path, Cost):-
+    %This will be find the heuristic value from the facts and assign it to variable "H"
+    heuristic(Start, Goal, H),
+    %(OpenList,ClosedList,Goal,Path,Cost)
+    a_star_recursion([[H, 0, [Start]]],[],Goal, ReversedPath, Cost),
+    %Arrange the path from start to end
+    reverse(ReversedPath,Path).
 
+%The basecase for A* recursion search
+%This whole base case is acting like a if statement connected with 'and' operators.
+%Even if one part connected with ',' fails, the whole base case return false.
+%So the base case get true only if CurrentCity equals to Goal otherwise it will keep recursing
+a_star_recursion([[_, G, [CurrentCity | PastCities]] | _], _ClosedList, Goal, FinalPath, FinalCost) :-
+    CurrentCity = Goal,
+    FinalPath = [CurrentCity | PastCities],
+    FinalCost = G.
 
+%If the base case is failed, this will be executed
+a_star_recursion([[_, G, [CurrentCity | PastCities]] | RestOfOpenList], ClosedList, Goal, FinalPath, FinalCost) :-
+    ( \+ member(CurrentCity, ClosedList) ->
+        % --- IF NOT VISITED: Expand it ---
+        %This line of code will add the CurrentCity to the ClosedList, it helps algorithm not to visit already visited city again.
+        NewClosedList = [CurrentCity|ClosedList],
+        expand_node(CurrentCity, G, PastCities, Goal, NewPaths),
+        %CombinedList is the name assigned for the list created by combining two lists.
+        append(NewPaths, RestOfOpenList, CombinedList),
+        %This sort predicate will sort the combined list and name it as SortedOpenList
+        sort(CombinedList,SortedOpenList),
+        %Calling the a_star_recursion again to function this as a loop
+        a_star_recursion(SortedOpenList, NewClosedList, Goal, FinalPath, FinalCost)
+    ;
+        % --- ELSE (ALREADY VISITED): Skip it and keep searching ---
+        a_star_recursion(RestOfOpenList, ClosedList, Goal, FinalPath, FinalCost)
+    ).
+
+%This predicate is for find new paths available from current city
+expand_node(CurrentCity, G, PastCities, Goal, NewPaths) :-
+    findall(
+        
+        [NewF, NewG, [NextCity, CurrentCity | PastCities]],
+        (
+            %This custom made predicate use for find the available roads leading to adjacent cities
+            connected(CurrentCity, NextCity, Distance),
+            \+ member(NextCity, [CurrentCity | PastCities]), % Prevent immediate loops
+            NewG is G + Distance,
+            heuristic(NextCity, Goal, H),
+            NewF is NewG + H
+        ),
+        %The List name holding all the new paths found.
+        NewPaths
+    ).
 
 
 
