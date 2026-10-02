@@ -24,6 +24,14 @@ heuristic(matale, gampola, 35).
 heuristic(digana, gampola, 35).
 heuristic(teldeniya, gampola, 40).
 heuristic(gampola, gampola, 0).
+heuristic(kandy, mahaiyawa, 2).
+heuristic(katugastota, mahaiyawa, 1.5).
+heuristic(peradeniya, mahaiyawa, 7).
+heuristic(tennakumbura, mahaiyawa, 9).
+heuristic(ampitiya, mahaiyawa, 6).
+heuristic(kundasale, mahaiyawa, 8).
+heuristic(getambe, mahaiyawa, 6).
+heuristic(mahaiyawa, mahaiyawa, 0).
 
 %Helps Prolog to understand bidirectional roads and avoid blocked roads
 connected(A,B,D):-
@@ -91,6 +99,7 @@ a_star_recursion([[_, G, [CurrentCity | PastCities]] | _], _ClosedList, Goal, Fi
 
 %If the base case is failed, this will be executed
 a_star_recursion([[_, G, [CurrentCity | PastCities]] | RestOfOpenList], ClosedList, Goal, FinalPath, FinalCost) :-
+    %To avoid the time waste by checking already visited city, we check whether it visited or not using the closed list.
     ( \+ member(CurrentCity, ClosedList) ->
         % --- IF NOT VISITED: Expand it ---
         %This line of code will add the CurrentCity to the ClosedList, it helps algorithm not to visit already visited city again.
