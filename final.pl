@@ -160,3 +160,14 @@ shortest_path([[Path, Cost] | Rest],
                   ShortestCost).
 
 %----------------------------------------------
+
+
+%--------------Interface-----------------------
+
+menu:-
+
+    nl, write('====== Food Delivery Route Finding System ======='), nl,
+    write('1. find path'),
+    read(choice),
+    handle(choice).
+    
