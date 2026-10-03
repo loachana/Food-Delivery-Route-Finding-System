@@ -216,3 +216,14 @@ menu:-
     write('1. find path'),
     read(Choice),nl,
     handle(Choice).
+
+% Handle choice 1: Find path
+handle(1) :- 
+    nl, write('Enter start location (end with a dot, e.g., kandy.): '), read(Start),
+    write('Enter goal location (end with a dot, e.g., gampola.): '), read(Goal),
+    show_all_paths(Start, Goal).
+
+% Handle invalid choices
+handle(_) :- 
+    nl, write('Invalid option! Please try again.'), nl, 
+    menu.
