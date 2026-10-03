@@ -1,28 +1,62 @@
 %roads
 
-road(kandy, katugastota, 5.4).
-road(kandy, peradeniya, 6.1).
-road(kandy, tennakumbura, 7.7).
-road(kandy, ampitiya, 5.2).
-road(kandy, kundasale, 7.0).
-road(kandy, getambe, 5.5).
-road(kandy, mahaiyawa, 2.5).
-road(katugastota, mahaiyawa, 2.0).
+road(kandy, katugastota, 6.7).
+road(kandy, peradeniya, 6.0).
+road(kandy, tennakumbura, 6.6).
+road(kandy, ampitiya, 4.9).
+road(kandy, kundasale, 14.5).
+road(kandy, getambe, 4.0).
+road(kandy, mahaiyawa, 2.2).
 
 
+road(katugastota, mahaiyawa, 4.6).
+
+
+% heuristic(Location, Goal, EstimatedDistance)
+heuristic(kandy, gampola, 20).
+heuristic(peradeniya, gampola, 15).
+heuristic(katugastota, gampola, 25).
+heuristic(kundasale, gampola, 30).
+heuristic(pilimathalawa, gampola, 10).
+heuristic(gelioya, gampola, 12).
+heuristic(kadugannawa, gampola, 8).
+heuristic(mawilmada, gampola, 30).
+heuristic(matale, gampola, 35).
+heuristic(digana, gampola, 35).
+heuristic(teldeniya, gampola, 40).
+heuristic(gampola, gampola, 0).
+
+
+heuristic(kandy, mahaiyawa, 2).
+heuristic(katugastota, mahaiyawa, 1.5).
+heuristic(peradeniya, mahaiyawa, 7).
+heuristic(tennakumbura, mahaiyawa, 9).
+heuristic(ampitiya, mahaiyawa, 6).
+heuristic(kundasale, mahaiyawa, 8).
+heuristic(getambe, mahaiyawa, 6).
+heuristic(mahaiyawa, mahaiyawa, 0).
+
+
+
+/*
 %H values
 h(katugastota, 0).
-h(kandy, 4.5).
-h(peradeniya, 10.5).
-h(tennakumbura, 10.8).
-h(ampitiya, 8.2).
-h(kundasale, 9.5).
-h(getambe, 7.5).
-h(mahaiyawa, 2.0).
-
+h(kandy, 6.7).
+h(peradeniya, 11.2).
+h(tennakumbura, 9.4).
+h(ampitiya, 11.0).
+h(kundasale, 12.9).
+h(getambe, 9.2).
+h(mahaiyawa, 4.6).
+*/
 
 :- dynamic(blocked/2).
 
+list_blocked :-
+    forall(
+        blocked(A, B),
+        (write(A-B), nl)
+    ).
 
 
 connected(A,B,D):-
@@ -70,6 +104,71 @@ path_cost([A,B|Rest],Cost):-
 	Cost is D + CostRest.
 
 
+
+
+astar(Start, Goal, Path, Cost):-
+    %This will be find the heuristic value from the facts and assign it to variable "H"
+    heuristic(Start, Goal, H),
+    %(OpenList,ClosedList,Goal,Path,Cost)
+    a_star_recursion([[H, 0, [Start]]],[],Goal, ReversedPath, Cost),
+    %Arrange the path from start to end
+    reverse(ReversedPath,Path).
+
+%The basecase for A* recursion search
+%This whole base case is acting like a if statement connected with 'and' operators.
+%Even if one part connected with ',' fails, the whole base case return false.
+%So the base case get true only if CurrentCity equals to Goal otherwise it will keep recursing
+a_star_recursion([[_, G, [CurrentCity | PastCities]] | _], _ClosedList, Goal, FinalPath, FinalCost) :-
+    CurrentCity = Goal,
+    FinalPath = [CurrentCity | PastCities],
+    FinalCost = G.
+
+%If the base case is failed, this will be executed
+a_star_recursion([[_, G, [CurrentCity | PastCities]] | RestOfOpenList], ClosedList, Goal, FinalPath, FinalCost) :-
+    %To avoid the time waste by checking already visited city, we check whether it visited or not using the closed list.
+    ( \+ member(CurrentCity, ClosedList) ->
+        % --- IF NOT VISITED: Expand it ---
+        %This line of code will add the CurrentCity to the ClosedList, it helps algorithm not to visit already visited city again.
+        NewClosedList = [CurrentCity|ClosedList],
+        expand_node(CurrentCity, G, PastCities, Goal, NewPaths),
+        %CombinedList is the name assigned for the list created by combining two lists.
+        append(NewPaths, RestOfOpenList, CombinedList),
+        %This sort predicate will sort the combined list and name it as SortedOpenList
+        sort(CombinedList,SortedOpenList),
+        %Calling the a_star_recursion again to function this as a loop
+        a_star_recursion(SortedOpenList, NewClosedList, Goal, FinalPath, FinalCost)
+    ;
+        % --- ELSE (ALREADY VISITED): Skip it and keep searching ---
+        a_star_recursion(RestOfOpenList, ClosedList, Goal, FinalPath, FinalCost)
+    ).
+
+%This predicate is for find new paths available from current city
+expand_node(CurrentCity, G, PastCities, Goal, NewPaths) :-
+    findall(
+        
+        [NewF, NewG, [NextCity, CurrentCity | PastCities]],
+        (
+            %This custom made predicate use for find the available roads leading to adjacent cities
+            connected(CurrentCity, NextCity, Distance),
+            \+ member(NextCity, [CurrentCity | PastCities]), % Prevent immediate loops
+            NewG is G + Distance,
+            heuristic(NextCity, Goal, H),
+            NewF is NewG + H
+        ),
+        %The List name holding all the new paths found.
+        NewPaths
+    ).
+
+
+
+
+
+
+
+
+
+/*
+%---------------------------------------------------------------------
 %A*
 astar(Start, Goal, Path, Cost):-
 	h(Start, H0),
@@ -90,7 +189,8 @@ astar_search([[_,G,[Current|Rest]]|Others], Goal, Path, Cost):-
 	astar_search(Sorted,Goal,Path,Cost).
 
 
-
+%-----------------------------------------------------------------
+*/
 
 %Display results
 
@@ -167,7 +267,52 @@ shortest_path([[Path, Cost] | Rest],
 menu:-
 
     nl, write('====== Food Delivery Route Finding System ======='), nl,
-    write('1. find path'),
-    read(choice),
-    handle(choice).
+    write('1. Find path: '), nl,
+    write('2. Block a road: '), nl,
+    write('3. Unblock a road: '), nl,
+    write('4. View blocked roads: '), nl,
+    write('5. Exit'), nl,
+    nl, write('Enter your choice: '),
+    read(Choice),
+    handle(Choice).
     
+handle(1):-
+    nl, write('Enter start location: '),
+    read(Start),
+    nl, write('Enter destination: '),
+    read(Goal),
+    show_all_paths(Start, Goal), menu ; nl, write('invalid input'), !, nl,
+    menu.
+
+handle(2):-
+    nl, write('Enter the starting location of the road to block: '),
+    read(Start),
+    nl, write('Enter the ending location of the road to block: '),
+    read(End),
+    assertz(blocked(Start, End)),
+    assertz(blocked(End, Start)),
+    nl, write(Start - End), write(': Road blocked successfully.'), nl,
+    menu.
+
+handle(3):-
+    nl, write('Enter the starting location of the road to unblock: '),
+    read(Start),
+    nl, write('Enter the ending location of the road to unblock: '),
+    read(End),
+    retractall(blocked(Start, End)),
+    retractall(blocked(End, Start)),
+    nl, write(Start - End), write(': Road unblocked successfully.'), nl,
+    menu.
+
+handle(4):-
+    nl, write('Blocked roads details:'), nl, nl,
+    list_blocked,
+    menu.
+
+handle(5):-
+    nl, write('Exiting the program. Goodbye!'), nl.
+
+handle(_):-
+    nl, write('Invalid choice. Please try again.'), nl,
+    menu.
+
