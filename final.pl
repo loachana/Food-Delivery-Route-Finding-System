@@ -214,6 +214,5 @@ menu:-
 
     nl, write('====== Food Delivery Route Finding System ======='), nl,
     write('1. find path'),
-    read(choice),
-    handle(choice).
-    
+    read(Choice),nl,
+    handle(Choice).
