@@ -1,18 +1,21 @@
+:- dynamic(blocked/2).
+
 %roads
+road(kandy, katugastota, 5.4).
+road(kandy, peradeniya, 6.1).
+road(kandy, tennakumbura, 7.7).
+road(kandy, ampitiya, 5.2).
+road(kandy, kundasale, 7.0).
+road(kandy, getambe, 5.5).
+road(kandy, mahaiyawa, 2.5).
+road(katugastota, mahaiyawa, 2.0).
 
-road(kandy, katugastota, 6.7).
-road(kandy, peradeniya, 6.0).
-road(kandy, tennakumbura, 6.6).
-road(kandy, ampitiya, 4.9).
-road(kandy, kundasale, 14.5).
-road(kandy, getambe, 4.0).
-road(kandy, mahaiyawa, 2.2).
 
-
-road(katugastota, mahaiyawa, 4.6).
-
+%Blocked Road(s)
+blocked(kandy, kundasale).
 
 % heuristic(Location, Goal, EstimatedDistance)
+% --- Goal: gampola ---
 heuristic(kandy, gampola, 20).
 heuristic(peradeniya, gampola, 15).
 heuristic(katugastota, gampola, 25).
@@ -24,9 +27,13 @@ heuristic(mawilmada, gampola, 30).
 heuristic(matale, gampola, 35).
 heuristic(digana, gampola, 35).
 heuristic(teldeniya, gampola, 40).
+heuristic(tennakumbura, gampola, 22).
+heuristic(ampitiya, gampola, 25).
+heuristic(getambe, gampola, 18).
+heuristic(mahaiyawa, gampola, 22).
 heuristic(gampola, gampola, 0).
 
-
+% --- Goal: mahaiyawa ---
 heuristic(kandy, mahaiyawa, 2).
 heuristic(katugastota, mahaiyawa, 1.5).
 heuristic(peradeniya, mahaiyawa, 7).
@@ -36,21 +43,76 @@ heuristic(kundasale, mahaiyawa, 8).
 heuristic(getambe, mahaiyawa, 6).
 heuristic(mahaiyawa, mahaiyawa, 0).
 
+% --- Goal: kandy ---
+heuristic(kandy, kandy, 0).
+heuristic(katugastota, kandy, 5.4).
+heuristic(peradeniya, kandy, 6.1).
+heuristic(tennakumbura, kandy, 7.7).
+heuristic(ampitiya, kandy, 5.2).
+heuristic(kundasale, kandy, 7.0).
+heuristic(getambe, kandy, 5.5).
+heuristic(mahaiyawa, kandy, 2.5).
 
+% --- Goal: katugastota ---
+heuristic(kandy, katugastota, 5.4).
+heuristic(katugastota, katugastota, 0).
+heuristic(peradeniya, katugastota, 10.0).
+heuristic(tennakumbura, katugastota, 12.0).
+heuristic(ampitiya, katugastota, 9.0).
+heuristic(kundasale, katugastota, 12.0).
+heuristic(getambe, katugastota, 8.0).
+heuristic(mahaiyawa, katugastota, 2.0).
 
-/*
-%H values
-h(katugastota, 0).
-h(kandy, 6.7).
-h(peradeniya, 11.2).
-h(tennakumbura, 9.4).
-h(ampitiya, 11.0).
-h(kundasale, 12.9).
-h(getambe, 9.2).
-h(mahaiyawa, 4.6).
-*/
+% --- Goal: peradeniya ---
+heuristic(kandy, peradeniya, 6.1).
+heuristic(katugastota, peradeniya, 10.0).
+heuristic(peradeniya, peradeniya, 0).
+heuristic(tennakumbura, peradeniya, 8.0).
+heuristic(ampitiya, peradeniya, 8.0).
+heuristic(kundasale, peradeniya, 10.0).
+heuristic(getambe, peradeniya, 8.0).
+heuristic(mahaiyawa, peradeniya, 7.0).
 
-:- dynamic(blocked/2).
+% --- Goal: tennakumbura ---
+heuristic(kandy, tennakumbura, 7.7).
+heuristic(katugastota, tennakumbura, 11.0).
+heuristic(peradeniya, tennakumbura, 8.0).
+heuristic(tennakumbura, tennakumbura, 0).
+heuristic(ampitiya, tennakumbura, 9.0).
+heuristic(kundasale, tennakumbura, 12.0).
+heuristic(getambe, tennakumbura, 10.0).
+heuristic(mahaiyawa, tennakumbura, 9.0).
+
+% --- Goal: ampitiya ---
+heuristic(kandy, ampitiya, 5.2).
+heuristic(katugastota, ampitiya, 9.0).
+heuristic(peradeniya, ampitiya, 8.0).
+heuristic(tennakumbura, ampitiya, 9.0).
+heuristic(ampitiya, ampitiya, 0).
+heuristic(kundasale, ampitiya, 6.0).
+heuristic(getambe, ampitiya, 8.0).
+heuristic(mahaiyawa, ampitiya, 6.0).
+
+% --- Goal: kundasale ---
+heuristic(kandy, kundasale, 7.0).
+heuristic(katugastota, kundasale, 12.0).
+heuristic(peradeniya, kundasale, 10.0).
+heuristic(tennakumbura, kundasale, 12.0).
+heuristic(ampitiya, kundasale, 6.0).
+heuristic(kundasale, kundasale, 0).
+heuristic(getambe, kundasale, 9.0).
+heuristic(mahaiyawa, kundasale, 8.0).
+
+% --- Goal: getambe ---
+heuristic(kandy, getambe, 5.5).
+heuristic(katugastota, getambe, 8.0).
+heuristic(peradeniya, getambe, 8.0).
+heuristic(tennakumbura, getambe, 10.0).
+heuristic(ampitiya, getambe, 8.0).
+heuristic(kundasale, getambe, 9.0).
+heuristic(getambe, getambe, 0).
+heuristic(mahaiyawa, getambe, 6.0).
+
 
 list_blocked :-
     forall(
@@ -58,7 +120,7 @@ list_blocked :-
         (write(A-B), nl)
     ).
 
-
+%Helps Prolog to understand bidirectional roads and avoid blocked roads
 connected(A,B,D):-
     road(A,B,D), \+blocked(A,B).
 
@@ -159,39 +221,6 @@ expand_node(CurrentCity, G, PastCities, Goal, NewPaths) :-
         NewPaths
     ).
 
-
-
-
-
-
-
-
-
-/*
-%---------------------------------------------------------------------
-%A*
-astar(Start, Goal, Path, Cost):-
-	h(Start, H0),
-	astar_search([[H0,0,[Start]]], Goal, RevPath, Cost),
-	reverse(RevPath, Path).
-
-astar_search([[_,Cost,[Goal|Rest]]|_], Goal, [Goal|Rest], Cost).
-astar_search([[_,G,[Current|Rest]]|Others], Goal, Path, Cost):-
-	findall([F2, G2,[Next,Current|Rest]],
-		(connected(Current, Next, StepCost),
-		\+ member(Next,[Current|Rest]),
-		G2 is G + StepCost,
-		h(Next,H),
-		F2 is G2 + H),
-		Children),
-	append(Others, Children, All),
-	sort(All,Sorted),
-	astar_search(Sorted,Goal,Path,Cost).
-
-
-%-----------------------------------------------------------------
-*/
-
 %Display results
 
 show_all_paths(Start, Goal):-
@@ -275,7 +304,7 @@ menu:-
     nl, write('Enter your choice: '),
     read(Choice),
     handle(Choice).
-    
+
 handle(1):-
     nl, write('Enter start location: '),
     read(Start),
@@ -315,4 +344,5 @@ handle(5):-
 handle(_):-
     nl, write('Invalid choice. Please try again.'), nl,
     menu.
+
 
