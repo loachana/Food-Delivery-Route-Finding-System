@@ -10,10 +10,12 @@ road(kandy, getambe, 5.5).
 road(kandy, mahaiyawa, 2.5).
 road(katugastota, mahaiyawa, 2.0).
 
+
 %Blocked Road(s)
 blocked(kandy, kundasale).
 
 % heuristic(Location, Goal, EstimatedDistance)
+% --- Goal: gampola ---
 heuristic(kandy, gampola, 20).
 heuristic(peradeniya, gampola, 15).
 heuristic(katugastota, gampola, 25).
@@ -25,7 +27,13 @@ heuristic(mawilmada, gampola, 30).
 heuristic(matale, gampola, 35).
 heuristic(digana, gampola, 35).
 heuristic(teldeniya, gampola, 40).
+heuristic(tennakumbura, gampola, 22).
+heuristic(ampitiya, gampola, 25).
+heuristic(getambe, gampola, 18).
+heuristic(mahaiyawa, gampola, 22).
 heuristic(gampola, gampola, 0).
+
+% --- Goal: mahaiyawa ---
 heuristic(kandy, mahaiyawa, 2).
 heuristic(katugastota, mahaiyawa, 1.5).
 heuristic(peradeniya, mahaiyawa, 7).
@@ -35,6 +43,82 @@ heuristic(kundasale, mahaiyawa, 8).
 heuristic(getambe, mahaiyawa, 6).
 heuristic(mahaiyawa, mahaiyawa, 0).
 
+% --- Goal: kandy ---
+heuristic(kandy, kandy, 0).
+heuristic(katugastota, kandy, 5.4).
+heuristic(peradeniya, kandy, 6.1).
+heuristic(tennakumbura, kandy, 7.7).
+heuristic(ampitiya, kandy, 5.2).
+heuristic(kundasale, kandy, 7.0).
+heuristic(getambe, kandy, 5.5).
+heuristic(mahaiyawa, kandy, 2.5).
+
+% --- Goal: katugastota ---
+heuristic(kandy, katugastota, 5.4).
+heuristic(katugastota, katugastota, 0).
+heuristic(peradeniya, katugastota, 10.0).
+heuristic(tennakumbura, katugastota, 12.0).
+heuristic(ampitiya, katugastota, 9.0).
+heuristic(kundasale, katugastota, 12.0).
+heuristic(getambe, katugastota, 8.0).
+heuristic(mahaiyawa, katugastota, 2.0).
+
+% --- Goal: peradeniya ---
+heuristic(kandy, peradeniya, 6.1).
+heuristic(katugastota, peradeniya, 10.0).
+heuristic(peradeniya, peradeniya, 0).
+heuristic(tennakumbura, peradeniya, 8.0).
+heuristic(ampitiya, peradeniya, 8.0).
+heuristic(kundasale, peradeniya, 10.0).
+heuristic(getambe, peradeniya, 8.0).
+heuristic(mahaiyawa, peradeniya, 7.0).
+
+% --- Goal: tennakumbura ---
+heuristic(kandy, tennakumbura, 7.7).
+heuristic(katugastota, tennakumbura, 11.0).
+heuristic(peradeniya, tennakumbura, 8.0).
+heuristic(tennakumbura, tennakumbura, 0).
+heuristic(ampitiya, tennakumbura, 9.0).
+heuristic(kundasale, tennakumbura, 12.0).
+heuristic(getambe, tennakumbura, 10.0).
+heuristic(mahaiyawa, tennakumbura, 9.0).
+
+% --- Goal: ampitiya ---
+heuristic(kandy, ampitiya, 5.2).
+heuristic(katugastota, ampitiya, 9.0).
+heuristic(peradeniya, ampitiya, 8.0).
+heuristic(tennakumbura, ampitiya, 9.0).
+heuristic(ampitiya, ampitiya, 0).
+heuristic(kundasale, ampitiya, 6.0).
+heuristic(getambe, ampitiya, 8.0).
+heuristic(mahaiyawa, ampitiya, 6.0).
+
+% --- Goal: kundasale ---
+heuristic(kandy, kundasale, 7.0).
+heuristic(katugastota, kundasale, 12.0).
+heuristic(peradeniya, kundasale, 10.0).
+heuristic(tennakumbura, kundasale, 12.0).
+heuristic(ampitiya, kundasale, 6.0).
+heuristic(kundasale, kundasale, 0).
+heuristic(getambe, kundasale, 9.0).
+heuristic(mahaiyawa, kundasale, 8.0).
+
+% --- Goal: getambe ---
+heuristic(kandy, getambe, 5.5).
+heuristic(katugastota, getambe, 8.0).
+heuristic(peradeniya, getambe, 8.0).
+heuristic(tennakumbura, getambe, 10.0).
+heuristic(ampitiya, getambe, 8.0).
+heuristic(kundasale, getambe, 9.0).
+heuristic(getambe, getambe, 0).
+heuristic(mahaiyawa, getambe, 6.0).
+
+
+list_blocked :-
+    forall(
+        blocked(A, B),
+        (write(A-B), nl)
+    ).
 
 %Helps Prolog to understand bidirectional roads and avoid blocked roads
 connected(A,B,D):-
@@ -82,7 +166,8 @@ path_cost([A,B|Rest],Cost):-
 	Cost is D + CostRest.
 
 
-%A*
+
+
 astar(Start, Goal, Path, Cost):-
     %This will be find the heuristic value from the facts and assign it to variable "H"
     heuristic(Start, Goal, H),
@@ -135,8 +220,6 @@ expand_node(CurrentCity, G, PastCities, Goal, NewPaths) :-
         %The List name holding all the new paths found.
         NewPaths
     ).
-
-
 
 %Display results
 
@@ -213,17 +296,53 @@ shortest_path([[Path, Cost] | Rest],
 menu:-
 
     nl, write('====== Food Delivery Route Finding System ======='), nl,
-    write('1. find path'),
-    read(Choice),nl,
+    write('1. Find path: '), nl,
+    write('2. Block a road: '), nl,
+    write('3. Unblock a road: '), nl,
+    write('4. View blocked roads: '), nl,
+    write('5. Exit'), nl,
+    nl, write('Enter your choice: '),
+    read(Choice),
     handle(Choice).
 
-% Handle choice 1: Find path
-handle(1) :- 
-    nl, write('Enter start location (end with a dot, e.g., kandy.): '), read(Start),
-    write('Enter goal location (end with a dot, e.g., gampola.): '), read(Goal),
-    show_all_paths(Start, Goal).
-
-% Handle invalid choices
-handle(_) :- 
-    nl, write('Invalid option! Please try again.'), nl, 
+handle(1):-
+    nl, write('Enter start location: '),
+    read(Start),
+    nl, write('Enter destination: '),
+    read(Goal),
+    show_all_paths(Start, Goal), menu ; nl, write('invalid input'), !, nl,
     menu.
+
+handle(2):-
+    nl, write('Enter the starting location of the road to block: '),
+    read(Start),
+    nl, write('Enter the ending location of the road to block: '),
+    read(End),
+    assertz(blocked(Start, End)),
+    assertz(blocked(End, Start)),
+    nl, write(Start - End), write(': Road blocked successfully.'), nl,
+    menu.
+
+handle(3):-
+    nl, write('Enter the starting location of the road to unblock: '),
+    read(Start),
+    nl, write('Enter the ending location of the road to unblock: '),
+    read(End),
+    retractall(blocked(Start, End)),
+    retractall(blocked(End, Start)),
+    nl, write(Start - End), write(': Road unblocked successfully.'), nl,
+    menu.
+
+handle(4):-
+    nl, write('Blocked roads details:'), nl, nl,
+    list_blocked,
+    menu.
+
+handle(5):-
+    nl, write('Exiting the program. Goodbye!'), nl.
+
+handle(_):-
+    nl, write('Invalid choice. Please try again.'), nl,
+    menu.
+
+
