@@ -1,3 +1,5 @@
+:- dynamic(blocked/2).
+
 %roads
 road(kandy, katugastota, 5.4).
 road(kandy, peradeniya, 6.1).
@@ -32,6 +34,7 @@ heuristic(ampitiya, mahaiyawa, 6).
 heuristic(kundasale, mahaiyawa, 8).
 heuristic(getambe, mahaiyawa, 6).
 heuristic(mahaiyawa, mahaiyawa, 0).
+
 
 %Helps Prolog to understand bidirectional roads and avoid blocked roads
 connected(A,B,D):-
